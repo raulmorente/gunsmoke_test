@@ -192,3 +192,11 @@ bool Collider::CheckCollision(const SDL_Rect& r) const
 	
 	return (r.x < (rect.x + rect.w) && (r.x + r.w) > rect.x && r.y < (rect.y + rect.h) && (r.y + r.h) >rect.y);
 }
+
+
+bool Collider::CheckCollision_2rect(const SDL_Rect& r, const SDL_Rect& t) const
+{
+//CLEAN
+
+	return (r.x < (t.x + t.w) && (r.x + r.w) > t.x && r.y < (t.y + t.h) && (r.y + r.h) >t.y);
+}

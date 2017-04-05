@@ -16,7 +16,7 @@
 ModulePlayer::ModulePlayer()
 {
 	// idle animation (just the ship)
-	idle.PushBack({66, 1, 32, 14});
+	/*idle.PushBack({66, 1, 32, 14});
 
 	// move upwards
 	up.PushBack({100, 1, 32, 14});
@@ -29,7 +29,7 @@ ModulePlayer::ModulePlayer()
 	down.PushBack({0, 1, 32, 14});
 	down.loop = false;
 	down.speed = 0.1f;
-    
+    */
     //Gun.Smoke movement animationes
     
     //idle / up / down
@@ -79,7 +79,7 @@ bool ModulePlayer::Start()
 
 	// TODO 2: Add a collider to the player
 
-	player = App->collision->AddCollider({ position.x,position.y,32,15 }, COLLIDER_PLAYER);
+	player = App->collision->AddCollider({ position.x-2,position.y,20,28 }, COLLIDER_PLAYER);
 	return true;
 }
 
@@ -97,6 +97,8 @@ bool ModulePlayer::CleanUp()
 update_status ModulePlayer::Update()
 {
 	int speed = 1;
+	int prev_x=position.x;
+	int prev_y=position.y;
 
 	/*if(App->input->keyboard[SDL_SCANCODE_A] == KEY_STATE::KEY_REPEAT)
 	{
@@ -174,32 +176,44 @@ update_status ModulePlayer::Update()
     // TODO 3: Update collider position to player position
 	player->SetPos(position.x,position.y);
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 13; ++i)
 	{
 		if (player->CheckCollision(App->scene_space->Wall[i]->rect))
 		{
-			App->fade->FadeToBlack((Module*)App->scene_space,(Module*)App->scene_intro);
+			position.x=prev_x;
+			if (player->CheckCollision_2rect(App->scene_space->Wall[i]->rect, {position.x-2,position.y-10,20,28}))
+			{
+				position.y = prev_y+5;
+			}
 		}
 	}
-    
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (player->CheckCollision(App->scene_space->Enemy->rect))
+		{
+			App->fade->FadeToBlack((Module*)App->scene_space, (Module*)App->scene_intro);
+		}
+	}
+
     //Gun.Smoke
     
     if (App->input->keyboard[SDL_SCANCODE_Z] == KEY_STATE::KEY_DOWN)
     {
         App->particles->AddParticle(App->particles->shot_l, position.x, position.y);
-        App->audio->Play_sound();
+//        App->audio->Play_sound();
     }
     
     if (App->input->keyboard[SDL_SCANCODE_X] == KEY_STATE::KEY_DOWN)
     {
         App->particles->AddParticle(App->particles->shot,position.x,position.y);
-        App->audio->Play_sound();
+//        App->audio->Play_sound();
     }
     
     if (App->input->keyboard[SDL_SCANCODE_C] == KEY_STATE::KEY_DOWN)
     {
         App->particles->AddParticle(App->particles->shot_r, position.x, position.y);
-        App->audio->Play_sound();
+//        App->audio->Play_sound();
         
     }
     
@@ -213,7 +227,35 @@ update_status ModulePlayer::Update()
     {
         current_animation = &idle;
     }
-    
+	//CAMARA LIMITS
+	if (position.x<0)
+	{
+		position.x =prev_x;
+	}
+	if (position.x > 205)
+	{
+		position.x = prev_x;
+	}
+
+	if (position.y > 200)
+	{
+		position.y -= 50;
+		for (int i = 0; i < 13; ++i)
+		{
+
+			if (player->CheckCollision(App->scene_space->Wall[i]->rect))
+			{
+				if (position.x > 112)
+				{
+					position.x -= 15;
+				}
+				if (position.x < 112)
+				{
+					position.x += 15;
+				}
+			}
+		}
+	}
     
     // Draw everything --------------------------------------
 	App->render->Blit(graphics, position.x, position.y, &(current_animation->GetCurrentFrame()));

@@ -16,7 +16,8 @@ public:
 	bool CleanUp();
 
 public:
-	Collider* Wall[3];
+	Collider* Wall[13];
+	Collider* Enemy;
 	SDL_Texture* background = nullptr;
 	SDL_Texture* stars = nullptr;
 };
